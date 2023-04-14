@@ -24,41 +24,30 @@ def clean_data():
 
     #Convertir todo a minusculas
     df = df.applymap(lambda s: s.lower() if type(s) == str else s)
+    
+    # Date check  
+    df['fecha_de_beneficio'] = pd.to_datetime(df['fecha_de_beneficio'],dayfirst=True)
+    
+    df.dropna(axis='index',inplace=True)
+    df.drop_duplicates(inplace=True)
 
+    # Lowercase check
+    df['sexo'] = df['sexo'].str.lower().astype(str).str.strip()
+    df['tipo_de_emprendimiento'] = df['tipo_de_emprendimiento'].str.lower().astype(str)
+    df['idea_negocio'] = df['idea_negocio'].str.lower().astype(str)
+    df['barrio'] = df['barrio'].str.lower().astype(str)
+    df['línea_credito'] = df['línea_credito'].str.lower().astype(str)
+     
+    # Whitespaces, hyphen and underscore checks
+    df['idea_negocio'] = df['idea_negocio'].str.replace('_',' ').str.replace('-',' ').str.strip()
+    df['barrio'] = df['barrio'].str.replace('_','-').str.replace('-',' ')
+    df['línea_credito'] = df['línea_credito'].str.replace('_',' ').str.replace('-',' ').str.strip()
 
-    #Limpiar Campo línea_credito
-    df['línea_credito'] = df['línea_credito'].str.replace('.','',regex=True)
-    df['línea_credito'] = df['línea_credito'].str.replace('-','',regex=True)
-    df['línea_credito'] = df['línea_credito'].str.replace('_','',regex=True)
-    df['línea_credito'] = df['línea_credito'].str.replace(' ','',regex=True)
-
-    #Limpiar Campo idea de negocio
-    df['idea_negocio'] = df['idea_negocio'].str.replace('.','',regex=True)
-    df['idea_negocio'] = df['idea_negocio'].str.replace('-','',regex=True)
-    df['idea_negocio'] = df['idea_negocio'].str.replace('_','',regex=True)
-    df['idea_negocio'] = df['idea_negocio'].str.replace(' ','',regex=True)
-
-    #Limpiar Campo tipo_de_emprendimiento
-    df['tipo_de_emprendimiento'] = df['tipo_de_emprendimiento'].str.replace('.','',regex=True)
-    df['tipo_de_emprendimiento'] = df['tipo_de_emprendimiento'].str.replace('-','',regex=True)
-    df['tipo_de_emprendimiento'] = df['tipo_de_emprendimiento'].str.replace('_','',regex=True)
-    df['tipo_de_emprendimiento'] = df['tipo_de_emprendimiento'].str.replace(' ','',regex=True)
-
-    #Limpiar Campo barrio
-    df['barrio'] = df['barrio'].str.replace('.','',regex=True)
-    df['barrio'] = df['barrio'].str.replace('-','',regex=True)
-    df['barrio'] = df['barrio'].str.replace('_','',regex=True)
-    df['barrio'] = df['barrio'].str.replace(' ','',regex=True)
-
-    #Limpiar Campo monto_del_credito
-    df['monto_del_credito'] = df['monto_del_credito'].str.replace('$','',regex=True)
-    df['monto_del_credito'] = df['monto_del_credito'].str.replace(',','',regex=True)
-    df['monto_del_credito'] = df['monto_del_credito'].str.replace(' ','',regex=True)
-    df['monto_del_credito'] = df['monto_del_credito'].apply(lambda x: x[0:x.find('.')+1] if x.find('.') != -1 else x)
-    df['monto_del_credito'] = df['monto_del_credito'].str.replace('.','',regex=True)
-
-    #Limpiar la fecha
-    df['fecha_de_beneficio'] = pd.to_datetime(df['fecha_de_beneficio'], infer_datetime_format=True)
+    # Money check
+    df['monto_del_credito'] = df['monto_del_credito'].str.replace(',','').str.replace('$','',regex=False).str.replace(' ','').str.strip().astype(float)   
+    
+    df.drop_duplicates(inplace=True)
+    df.dropna(axis='index',inplace=True)
 
     #eliminar registos con campos vacios
     df = df.dropna()
